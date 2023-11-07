@@ -84,7 +84,6 @@ const tooltip = d3.select("body").append("div")
     .style("border", "1px solid #ccc")
     .style("border-radius", "5px");
 
-// Define your state abbreviations to IDs mapping
 const stateAbbreviationsToIds = {
   "AL": "01", "AK": "02", "AZ": "04", "AR": "05", "CA": "06", 
   "CO": "08", "CT": "09", "DE": "10", "FL": "12", "GA": "13", 
@@ -103,7 +102,7 @@ async function loadData() {
     const csvData = await d3.csv("incarceration_trends.csv");
     const us = await d3.json("https://d3js.org/us-10m.v1.json");
 
-    // Process the CSV data
+
     const stateRates = {};
     csvData.filter(d => d.year === "2018").forEach(d => {
         const state = d.state;
@@ -115,7 +114,7 @@ async function loadData() {
         stateRates[state].count += 1;
     });
 
-    // Calculate average rates by state
+
     for (const state in stateRates) {
         const data = stateRates[state];
         rateByState.set(state, data.sum / data.count);
@@ -132,14 +131,14 @@ function ready(us) {
       .data(topojson.feature(us, us.objects.states).features)
       .enter().append("path")
       .attr("fill", d => {
-          // Find the state abbreviation based on the state's numerical ID
+          
           const stateAbbreviation = Object.keys(stateAbbreviationsToIds).find(key => stateAbbreviationsToIds[key] === d.id.toString().padStart(2, '0'));
           const rate = rateByState.get(stateAbbreviation);
-          return rate ? color(rate) : "#ccc"; // Use the color scale for the rate
+          return rate ? color(rate) : "#ccc"; 
       })
       .attr("d", path)
       .on("mouseover", function(event, d) {
-          // Find the state abbreviation based on the state's numerical ID
+        
           const stateAbbreviation = Object.keys(stateAbbreviationsToIds).find(key => stateAbbreviationsToIds[key] === d.id.toString().padStart(2, '0'));
           const rate = rateByState.get(stateAbbreviation);
           tooltip.html(`${stateAbbreviation} Average Incarceration Rate: ${rate ? rate.toFixed(2): 'No data'}`)
@@ -215,7 +214,7 @@ function backwardClicked() {
     }
 
     if (kf.svgUpdate) {
-        kf.svgUpdate(); // Call the function defined in the keyframe
+        kf.svgUpdate(); 
     }
 }
 
@@ -223,8 +222,7 @@ function backwardClicked() {
 function highlightState(stateAbbreviation, highlightColor) {
   svg.selectAll(".state")
      .filter(d => {
-          // This assumes the state abbreviation is stored in 'd.properties.stateAbbr'
-          // Adjust if your data uses a different property name
+   
           return d.properties.stateAbbr === stateAbbreviation;
       })
      .transition()
@@ -232,7 +230,7 @@ function highlightState(stateAbbreviation, highlightColor) {
           if (highlightColor) {
               return highlightColor;
           } else {
-              // Reset to the original color based on the rate
+          
               const rate = rateByState.get(stateAbbreviation);
               return rate ? color(rate) : "#ccc";
           }
